@@ -168,7 +168,8 @@ module RDF::Turtle
     # @return [RDF::Statement] Added statement
     # @raise [RDF::ReaderError] Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
     def add_statement(production, statement)
-      puts "add_statement #{@lexer}"
+      puts "yago statement id: #{@statement_id}"
+      puts "add_statement #{statement}"
       error("Statement is invalid: #{statement.inspect.inspect}", production: produciton) if validate? && statement.invalid?
       @callback.call(statement) if statement.subject &&
                                    statement.predicate &&
@@ -244,6 +245,8 @@ module RDF::Turtle
         case token.type
         when :BASE, :PREFIX
           read_directive || error("Failed to parse directive", production: :directive, token: token)
+        when :YAGO_STATEMENT_ID
+          puts 'yago statement id found'
         elsif 
           read_triples || error("Expected token", production: :statement, token: token)
           if !log_recovering? || @lexer.first === '.'
