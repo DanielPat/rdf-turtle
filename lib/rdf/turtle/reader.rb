@@ -67,7 +67,7 @@ module RDF::Turtle
         reader.each_statement do |statement|
           puts "#{statement.id} #{statement.inspect}"
           i = i + 1
-          break if limit && i <= limit
+          break if limit && i >= limit
         end
       end
     end
