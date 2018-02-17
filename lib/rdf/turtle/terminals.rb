@@ -63,6 +63,8 @@ module RDF::Turtle
     STRING_LITERAL_LONG_SINGLE_QUOTE = /'''(?:(?:'|'')?(?:[^'\\]|#{ECHAR}|#{UCHAR}))*'''/m.freeze
     # 25
     STRING_LITERAL_LONG_QUOTE        = /"""(?:(?:"|"")?(?:[^"\\]|#{ECHAR}|#{UCHAR}))*"""/m.freeze
+    
+    YAGO_STATEMENT_ID                = /(#@\s[^\n\r]*)/.freeze
 
     # 161s
     WS                   = /(?:\s|(?:#[^\n\r]*))+/m.freeze
