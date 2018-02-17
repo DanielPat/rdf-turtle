@@ -180,7 +180,10 @@ module RDF::Turtle
 
     # Process a URI against base
     def process_iri(iri)
-      iri = iri.value[1..-2] if iri === :IRIREF
+      case iri
+      when :IRIREF then iri = iri.value[1..-2]
+      when :YAGO_STATEMENT_ID then iri = iri.value[4..-2]
+      end
       value = RDF::URI(iri)
       value = base_uri.join(value) if value.relative?
       value.validate! if validate?
@@ -477,19 +480,17 @@ module RDF::Turtle
     def read_iri
       token = @lexer.first
       case token && token.type
-      when :IRIREF then prod(:iri)  {process_iri(@lexer.shift)}
+      when :IRIREF, :YAGO_STATEMENT_ID then prod(:iri)  {process_iri(@lexer.shift)}
       when :PNAME_LN, :PNAME_NS then prod(:iri) {pname(*@lexer.shift.value.split(':', 2))}
       end
     end
 
     def read_yago_statement_id
-      prod(:statement_resource) do
+      prod(:yago_statement_resource) do
         token = @lexer.first
         if token && token.type == :YAGO_STATEMENT_ID
           prod(:yago_statement) do
-            token = @lexer.shift
-            token.value = token.value[3..-1]
-            @statement_id = read_iri(token)
+            @statement_id = read_iri
           end
         end
       end
