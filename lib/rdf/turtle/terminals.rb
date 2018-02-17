@@ -66,8 +66,6 @@ module RDF::Turtle
     
     YAGO_STATEMENT_ID                = /(#@\s[^\n\r]*)/.freeze
 
-    YAGO_STATEMENT_ID                = /(#@\s[^\n\r]*)/.freeze
-
     # 161s
     WS                   = /(?:\s|(?:#*\s[^\n\r]*))+/m.freeze
     # 162s
