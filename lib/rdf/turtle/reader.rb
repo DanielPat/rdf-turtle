@@ -190,10 +190,6 @@ module RDF::Turtle
     rescue ArgumentError => e
       error("process_iri", e)
     end
-
-    def process_yago_statement_id(ysi)
-      ysi = ysi.value[4..-2] if ysi === :YAGO_STATEMENT_ID
-      value = RDF::URI(ysi)
     
     # Create a literal
     def literal(value, options = {})
