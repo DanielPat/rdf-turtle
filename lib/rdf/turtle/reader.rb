@@ -248,13 +248,8 @@ module RDF::Turtle
         when :BASE, :PREFIX
           read_directive || error("Failed to parse directive", production: :directive, token: token)
         when :YAGO_STATEMENT_ID
-<<<<<<< HEAD
-          puts "triggered Yago Statement"
-        else
-=======
           puts 'yago statement id found'
-        elsif 
->>>>>>> develop
+        else
           read_triples || error("Expected token", production: :statement, token: token)
           if !log_recovering? || @lexer.first === '.'
             # If recovering, we will have eaten the closing '.'
