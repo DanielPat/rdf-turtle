@@ -249,6 +249,8 @@ module RDF::Turtle
           read_directive || error("Failed to parse directive", production: :directive, token: token)
         when :YAGO_STATEMENT_ID
           puts 'yago statement id found'
+          token = @lexer.shift
+          puts "#{token.type} #{token.value}"
         else
           read_triples || error("Expected token", production: :statement, token: token)
           if !log_recovering? || @lexer.first === '.'
