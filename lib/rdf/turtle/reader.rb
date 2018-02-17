@@ -180,7 +180,7 @@ module RDF::Turtle
 
     # Process a URI against base
     def process_iri(iri)
-      case iri
+      case iri.type
       when :IRIREF then iri = iri.value[1..-2]
       when :YAGO_STATEMENT_ID then iri = iri.value[4..-2]
       end
