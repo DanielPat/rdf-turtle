@@ -15,6 +15,7 @@ module RDF::Turtle
     terminal(:ANON,                             ANON)
     terminal(:BLANK_NODE_LABEL,                 BLANK_NODE_LABEL)
     terminal(:IRIREF,                           IRIREF, unescape:  true)
+    terminal(:YAGO_STATEMENT_ID,                YAGO_STATEMENT_ID, unescape: true)
     terminal(:DOUBLE,                           DOUBLE)
     terminal(:DECIMAL,                          DECIMAL)
     terminal(:INTEGER,                          INTEGER)
@@ -471,6 +472,7 @@ module RDF::Turtle
     def read_iri
       token = @lexer.first
       case token && token.type
+      when :YAGO_STATEMENT_ID then puts "matched yago statement id"
       when :IRIREF then prod(:iri)  {process_iri(@lexer.shift)}
       when :PNAME_LN, :PNAME_NS then prod(:iri) {pname(*@lexer.shift.value.split(':', 2))}
       end
