@@ -190,6 +190,10 @@ module RDF::Turtle
     rescue ArgumentError => e
       error("process_iri", e)
     end
+
+    def process_yago_statement_id(ysi)
+      ysi = ysi.value[4..-2] if ysi === :YAGO_STATEMENT_ID
+      value = RDF::URI(ysi)
     
     # Create a literal
     def literal(value, options = {})
@@ -249,8 +253,7 @@ module RDF::Turtle
           read_directive || error("Failed to parse directive", production: :directive, token: token)
         when :YAGO_STATEMENT_ID
           puts 'yago statement id found'
-          token = @lexer.shift
-          puts "#{token.type} #{token.value}"
+          read_yago_statement_id
         else
           read_triples || error("Expected token", production: :statement, token: token)
           if !log_recovering? || @lexer.first === '.'
@@ -398,7 +401,7 @@ module RDF::Turtle
       case token.type || token.value
       when :INTEGER then prod(:literal) {literal(@lexer.shift.value, datatype:  RDF::XSD.integer)}
       when :DECIMAL
-        prod(:litearl) do
+        prod(:literal) do
           value = @lexer.shift.value
           value = "0#{value}" if value.start_with?(".")
           literal(value, datatype:  RDF::XSD.decimal)
@@ -478,9 +481,21 @@ module RDF::Turtle
     def read_iri
       token = @lexer.first
       case token && token.type
-      when :YAGO_STATEMENT_ID then puts "matched yago statement id"
       when :IRIREF then prod(:iri)  {process_iri(@lexer.shift)}
       when :PNAME_LN, :PNAME_NS then prod(:iri) {pname(*@lexer.shift.value.split(':', 2))}
+      end
+    end
+
+    def read_yago_statement_id
+      prod(:statement_resource) do
+        token = @lexer.first
+        if token && token.type == :YAGO_STATEMENT_ID
+          prod(:yago_statement) do
+            token = @lexer.shift
+            token.value = token.value[3..-1]
+            @statement_id = read_iri(token)
+          end
+        end
       end
     end
 
