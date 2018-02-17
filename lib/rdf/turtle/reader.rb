@@ -240,6 +240,7 @@ module RDF::Turtle
     def read_statement
       prod(:statement, %w{.}) do
         error("read_statement", "Unexpected end of file") unless token = @lexer.first
+        puts @lexer.first
         case token.type
         when :BASE, :PREFIX
           read_directive || error("Failed to parse directive", production: :directive, token: token)
