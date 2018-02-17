@@ -15,7 +15,11 @@ module RDF::Turtle
     terminal(:ANON,                             ANON)
     terminal(:BLANK_NODE_LABEL,                 BLANK_NODE_LABEL)
     terminal(:IRIREF,                           IRIREF, unescape:  true)
+<<<<<<< HEAD
     terminal(:YAGO_STATEMENT_ID,                YAGO_STATEMENT_ID, unescape: true)
+=======
+    terminal(:YAGO_STATEMENT_ID,                YAGO_STATEMENT_ID, usescape: true)
+>>>>>>> develop
     terminal(:DOUBLE,                           DOUBLE)
     terminal(:DECIMAL,                          DECIMAL)
     terminal(:INTEGER,                          INTEGER)
@@ -112,6 +116,7 @@ module RDF::Turtle
           end
         end
       end
+      @statement_id = nil
     end
 
     def inspect
@@ -168,7 +173,8 @@ module RDF::Turtle
     # @return [RDF::Statement] Added statement
     # @raise [RDF::ReaderError] Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
     def add_statement(production, statement)
-      puts "add statement #{statement}"
+      puts "yago statement id: #{@statement_id}"
+      puts "add_statement #{statement}"
       error("Statement is invalid: #{statement.inspect.inspect}", production: produciton) if validate? && statement.invalid?
       @callback.call(statement) if statement.subject &&
                                    statement.predicate &&
@@ -246,8 +252,13 @@ module RDF::Turtle
         when :BASE, :PREFIX
           read_directive || error("Failed to parse directive", production: :directive, token: token)
         when :YAGO_STATEMENT_ID
+<<<<<<< HEAD
           puts "triggered Yago Statement"
         else
+=======
+          puts 'yago statement id found'
+        elsif 
+>>>>>>> develop
           read_triples || error("Expected token", production: :statement, token: token)
           if !log_recovering? || @lexer.first === '.'
             # If recovering, we will have eaten the closing '.'
