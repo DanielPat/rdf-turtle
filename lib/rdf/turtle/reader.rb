@@ -245,6 +245,8 @@ module RDF::Turtle
         case token.type
         when :BASE, :PREFIX
           read_directive || error("Failed to parse directive", production: :directive, token: token)
+        when :YAGO_STATEMENT_ID
+          puts "triggered Yago Statement"
         else
           read_triples || error("Expected token", production: :statement, token: token)
           if !log_recovering? || @lexer.first === '.'
