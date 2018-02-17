@@ -5,6 +5,7 @@ module RDF::Turtle
   ##
   # A parser for the Turtle 2
   class Reader < RDF::Reader
+    attr_reader :statement_id
     format Format
     include EBNF::LL1::Parser
     include RDF::Turtle::Terminals
@@ -92,6 +93,7 @@ module RDF::Turtle
         }.merge(options)
         @options = {prefixes:  {nil => ""}}.merge(@options) unless @options[:validate]
         @prod_stack = []
+        @statement_id = nil
 
         @options[:base_uri] = RDF::URI(base_uri || "")
         log_debug("base IRI") {base_uri.inspect}
@@ -165,6 +167,7 @@ module RDF::Turtle
     # @return [RDF::Statement] Added statement
     # @raise [RDF::ReaderError] Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
     def add_statement(production, statement)
+      puts "add statement #{@lexer}"
       error("Statement is invalid: #{statement.inspect.inspect}", production: produciton) if validate? && statement.invalid?
       @callback.call(statement) if statement.subject &&
                                    statement.predicate &&
