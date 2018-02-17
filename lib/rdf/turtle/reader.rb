@@ -180,10 +180,8 @@ module RDF::Turtle
 
     # Process a URI against base
     def process_iri(iri)
-      case iri.type
-      when :IRIREF then iri = iri.value[1..-2]
-      when :YAGO_STATEMENT_ID then iri = iri.value[4..-2]
-      end
+      iri = iri.value[1..-2] if iri === :IRIREF
+      iri = iri.value[4..-2] if iri === :YAGO_STATEMENT_ID
       value = RDF::URI(iri)
       value = base_uri.join(value) if value.relative?
       value.validate! if validate?
