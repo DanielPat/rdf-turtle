@@ -15,11 +15,7 @@ module RDF::Turtle
     terminal(:ANON,                             ANON)
     terminal(:BLANK_NODE_LABEL,                 BLANK_NODE_LABEL)
     terminal(:IRIREF,                           IRIREF, unescape:  true)
-<<<<<<< HEAD
     terminal(:YAGO_STATEMENT_ID,                YAGO_STATEMENT_ID, unescape: true)
-=======
-    terminal(:YAGO_STATEMENT_ID,                YAGO_STATEMENT_ID, usescape: true)
->>>>>>> develop
     terminal(:DOUBLE,                           DOUBLE)
     terminal(:DECIMAL,                          DECIMAL)
     terminal(:INTEGER,                          INTEGER)
