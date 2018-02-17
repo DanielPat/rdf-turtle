@@ -5,6 +5,7 @@ module RDF::Turtle
   ##
   # A parser for the Turtle 2
   class Reader < RDF::Reader
+    attr_reader :statement_id
     format Format
     include EBNF::LL1::Parser
     include RDF::Turtle::Terminals
@@ -92,7 +93,6 @@ module RDF::Turtle
         }.merge(options)
         @options = {prefixes:  {nil => ""}}.merge(@options) unless @options[:validate]
         @prod_stack = []
-        @statement_id = nil
 
         @options[:base_uri] = RDF::URI(base_uri || "")
         log_debug("base IRI") {base_uri.inspect}
@@ -110,6 +110,7 @@ module RDF::Turtle
           end
         end
       end
+      @statement_id = nil
     end
 
     def inspect
