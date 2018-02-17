@@ -92,6 +92,7 @@ module RDF::Turtle
         }.merge(options)
         @options = {prefixes:  {nil => ""}}.merge(@options) unless @options[:validate]
         @prod_stack = []
+        @statement_id = nil
 
         @options[:base_uri] = RDF::URI(base_uri || "")
         log_debug("base IRI") {base_uri.inspect}
@@ -240,7 +241,7 @@ module RDF::Turtle
         case token.type
         when :BASE, :PREFIX
           read_directive || error("Failed to parse directive", production: :directive, token: token)
-        else
+        elsif 
           read_triples || error("Expected token", production: :statement, token: token)
           if !log_recovering? || @lexer.first === '.'
             # If recovering, we will have eaten the closing '.'
