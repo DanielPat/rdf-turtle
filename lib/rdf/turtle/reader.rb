@@ -94,7 +94,6 @@ module RDF::Turtle
         }.merge(options)
         @options = {prefixes:  {nil => ""}}.merge(@options) unless @options[:validate]
         @prod_stack = []
-        @statement_id = nil
 
         @options[:base_uri] = RDF::URI(base_uri || "")
         log_debug("base IRI") {base_uri.inspect}
@@ -169,9 +168,9 @@ module RDF::Turtle
     # @return [RDF::Statement] Added statement
     # @raise [RDF::ReaderError] Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
     def add_statement(production, statement)
-      puts "yago statement id: #{@statement_id}"
-      puts "add_statement #{statement}"
       error("Statement is invalid: #{statement.inspect.inspect}", production: produciton) if validate? && statement.invalid?
+      statement.id = @statement_id if @statement_id && @statement_id.uri?
+      @statement_id = nil if statement.id
       @callback.call(statement) if statement.subject &&
                                    statement.predicate &&
                                    statement.object &&
@@ -249,7 +248,6 @@ module RDF::Turtle
         when :BASE, :PREFIX
           read_directive || error("Failed to parse directive", production: :directive, token: token)
         when :YAGO_STATEMENT_ID
-          puts 'yago statement id found'
           read_yago_statement_id
         else
           read_triples || error("Expected token", production: :statement, token: token)
