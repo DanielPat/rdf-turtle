@@ -61,6 +61,17 @@ module RDF::Turtle
       reader
     end
 
+    def self.inspect_statements(path, limit = nil)
+      i = 0
+      self.open(path) do |reader|
+        reader.each_statement do |statement|
+          puts "#{statement.id} #{statement.inspect}"
+          i = i + 1
+          break if limit && i <= limit
+        end
+      end
+    end
+
     ##
     # Initializes a new reader instance.
     #
@@ -243,7 +254,6 @@ module RDF::Turtle
     def read_statement
       prod(:statement, %w{.}) do
         error("read_statement", "Unexpected end of file") unless token = @lexer.first
-        puts "#{token.type} #{token.value}"
         case token.type
         when :BASE, :PREFIX
           read_directive || error("Failed to parse directive", production: :directive, token: token)
