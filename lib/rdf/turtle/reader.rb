@@ -136,7 +136,6 @@ module RDF::Turtle
     # @return [void]
     def each_statement(&block)
       if block_given?
-        5.times {|t| puts caller[t]}
         log_recover
         @callback = block
 
@@ -180,8 +179,6 @@ module RDF::Turtle
     # @raise [RDF::ReaderError] Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
     def add_statement(production, statement)
       error("Statement is invalid: #{statement.inspect.inspect}", production: produciton) if validate? && statement.invalid?
-      puts @callback.inspect
-      puts @callback.to_s
       @callback.call(statement) if statement.subject &&
                                    statement.predicate &&
                                    statement.object &&
@@ -322,7 +319,6 @@ module RDF::Turtle
       prod(:triples, %w{.}) do
         error("read_triples", "Unexpected end of file") unless token = @lexer.first
         id = read_yago_statement_id
-        10.times {|t| puts caller[t]}
         puts id
         case token.type || token.value
         when '['
