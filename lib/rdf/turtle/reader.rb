@@ -509,6 +509,7 @@ module RDF::Turtle
     end
 
     def prod(production, recover_to = [])
+      10.times {|t| puts caller[t]}
       @prod_stack << {prod: production, recover_to: recover_to}
       @options[:log_depth] += 1
       log_recover("#{production}(start)") {"token: #{@lexer.first.inspect}"}
