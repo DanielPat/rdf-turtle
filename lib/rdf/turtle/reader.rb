@@ -179,7 +179,8 @@ module RDF::Turtle
     # @raise [RDF::ReaderError] Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
     def add_statement(production, statement)
       error("Statement is invalid: #{statement.inspect.inspect}", production: produciton) if validate? && statement.invalid?
-      puts @callback
+      puts @callback.inspect
+      puts @callback.to_s
       @callback.call(statement) if statement.subject &&
                                    statement.predicate &&
                                    statement.object &&
