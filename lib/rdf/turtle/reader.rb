@@ -268,16 +268,6 @@ module RDF::Turtle
       end
     end
 
-    def read_yago_statement_id
-      prod(:yago_statement_resource) do
-        token = @lexer.first
-        return nil unless token && token.type == :YAGO_STATEMENT_ID
-        prod(:yago_statement) do
-          read_iri
-        end
-      end
-    end
-
     # @return [void]
     def read_directive
       prod(:directive, %w{.}) do
@@ -339,6 +329,16 @@ module RDF::Turtle
           # subject predicateObjectList
           subject = read_subject || error("Failed to parse subject", production: :triples, token: @lexer.first)
           read_predicateObjectList(subject, id) || error("Expected predicateObjectList", production: :triples, token: @lexer.first)
+        end
+      end
+    end
+
+    def read_yago_statement_id
+      prod(:yago_statement_resource) do
+        token = @lexer.first
+        return nil unless token && token.type == :YAGO_STATEMENT_ID
+        prod(:yago_statement) do
+          read_iri
         end
       end
     end
