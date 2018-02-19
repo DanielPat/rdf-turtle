@@ -256,8 +256,7 @@ module RDF::Turtle
         when :BASE, :PREFIX
           read_directive || error("Failed to parse directive", production: :directive, token: token)
         else
-          id = read_yago_statement_id
-          read_triples(id) || error("Expected token", production: :statement, token: token)
+          read_triples || error("Expected token", production: :statement, token: token)
           if !log_recovering? || @lexer.first === '.'
             # If recovering, we will have eaten the closing '.'
             token = @lexer.shift
@@ -327,10 +326,10 @@ module RDF::Turtle
     end
 
     # @return [Object] returns the last verb matched, or subject BNode on predicateObjectList?
-    def read_triples(id = nil)
+    def read_triples
       prod(:triples, %w{.}) do
         error("read_triples", "Unexpected end of file") unless token = @lexer.first
-        puts "#{token} is '.'" if token.value == '.'
+        id = read_yago_statement_id
         case token.type || token.value
         when '['
           # blankNodePropertyList predicateObjectList? 
