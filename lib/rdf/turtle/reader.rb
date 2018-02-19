@@ -337,6 +337,7 @@ module RDF::Turtle
       prod(:yago_statement_resource) do
         token = @lexer.first
         return nil unless token && token.type == :YAGO_STATEMENT_ID
+        puts 'yago statement'
         prod(:yago_statement) do
           read_iri
         end
