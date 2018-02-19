@@ -319,7 +319,6 @@ module RDF::Turtle
       prod(:triples, %w{.}) do
         error("read_triples", "Unexpected end of file") unless token = @lexer.first
         id = read_yago_statement_id
-        puts id
         case token.type || token.value
         when '['
           # blankNodePropertyList predicateObjectList? 
@@ -337,7 +336,6 @@ module RDF::Turtle
       prod(:yago_statement_resource) do
         token = @lexer.first
         return nil unless token && token.type == :YAGO_STATEMENT_ID
-        puts 'yago statement'
         prod(:yago_statement) do
           read_iri
         end
