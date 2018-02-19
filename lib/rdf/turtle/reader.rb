@@ -136,6 +136,7 @@ module RDF::Turtle
     # @return [void]
     def each_statement(&block)
       if block_given?
+        5.times {|t| puts caller[t]}
         log_recover
         @callback = block
 
