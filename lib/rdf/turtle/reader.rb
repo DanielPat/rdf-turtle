@@ -122,7 +122,6 @@ module RDF::Turtle
           end
         end
       end
-      @statement_id = nil
     end
 
     def inspect
@@ -181,7 +180,6 @@ module RDF::Turtle
     def add_statement(production, statement)
       error("Statement is invalid: #{statement.inspect.inspect}", production: produciton) if validate? && statement.invalid?
       statement.id = @statement_id if @statement_id && @statement_id.uri?
-      @statement_id = nil if statement.id
       @callback.call(statement) if statement.subject &&
                                    statement.predicate &&
                                    statement.object &&
@@ -257,10 +255,9 @@ module RDF::Turtle
         case token.type
         when :BASE, :PREFIX
           read_directive || error("Failed to parse directive", production: :directive, token: token)
-        when :YAGO_STATEMENT_ID
-          read_yago_statement_id
         else
-          read_triples || error("Expected token", production: :statement, token: token)
+          id = read_yago_statement_id
+          read_triples(id) || error("Expected token", production: :statement, token: token)
           if !log_recovering? || @lexer.first === '.'
             # If recovering, we will have eaten the closing '.'
             token = @lexer.shift
@@ -268,6 +265,16 @@ module RDF::Turtle
               error("Expected '.' following triple", production: :statement, token: token)
             end
           end
+        end
+      end
+    end
+
+    def read_yago_statement_id
+      prod(:yago_statement_resource) do
+        token = @lexer.first
+        return nil unless token && token.type == :YAGO_STATEMENT_ID
+        prod(:yago_statement) do
+          read_iri
         end
       end
     end
@@ -320,31 +327,32 @@ module RDF::Turtle
     end
 
     # @return [Object] returns the last verb matched, or subject BNode on predicateObjectList?
-    def read_triples
+    def read_triples(id = nil)
       prod(:triples, %w{.}) do
         error("read_triples", "Unexpected end of file") unless token = @lexer.first
+        puts "#{token} is '.'" if token.value == '.'
         case token.type || token.value
         when '['
           # blankNodePropertyList predicateObjectList? 
           subject = read_blankNodePropertyList || error("Failed to parse blankNodePropertyList", production: :triples, token: @lexer.first)
-          read_predicateObjectList(subject) || subject
+          read_predicateObjectList(subject, id) || subject
         else
           # subject predicateObjectList
           subject = read_subject || error("Failed to parse subject", production: :triples, token: @lexer.first)
-          read_predicateObjectList(subject) || error("Expected predicateObjectList", production: :triples, token: @lexer.first)
+          read_predicateObjectList(subject, id) || error("Expected predicateObjectList", production: :triples, token: @lexer.first)
         end
       end
     end
 
     # @param [RDF::Resource] subject
     # @return [RDF::URI] the last matched verb
-    def read_predicateObjectList(subject)
+    def read_predicateObjectList(subject, id)
       prod(:predicateObjectList, %{;}) do
         last_verb = nil
         while verb = read_verb
           last_verb = verb
           prod(:_predicateObjectList_5) do
-            read_objectList(subject, verb) || error("Expected objectList", production: :predicateObjectList, token: @lexer.first)
+            read_objectList(subject, verb, id) || error("Expected objectList", production: :predicateObjectList, token: @lexer.first)
           end
           break unless @lexer.first === ';'
           @lexer.shift while @lexer.first === ';'
@@ -354,10 +362,10 @@ module RDF::Turtle
     end
 
     # @return [RDF::Term] the last matched subject
-    def read_objectList(subject, predicate)
+    def read_objectList(subject, predicate, id)
       prod(:objectList, %{,}) do
         last_object = nil
-        while object = prod(:_objectList_2) {read_object(subject, predicate)}
+        while object = prod(:_objectList_2) {read_object(subject, predicate, id)}
           last_object = object
           break unless @lexer.first === ','
           @lexer.shift while @lexer.first === ','
@@ -386,7 +394,7 @@ module RDF::Turtle
     end
 
     # @return [void]
-    def read_object(subject = nil, predicate = nil)
+    def read_object(subject = nil, predicate = nil, id = nil)
       prod(:object) do
         if object = read_iri ||
           read_BlankNode ||
@@ -394,7 +402,9 @@ module RDF::Turtle
           read_blankNodePropertyList ||
           read_literal
 
-          add_statement(:object, RDF::Statement(subject, predicate, object)) if subject && predicate
+          statement = RDF::Statement(subject, predicate, object)
+          statement.id = id
+          add_statement(:object, statement) if subject && predicate
           object
         end
       end
@@ -488,17 +498,6 @@ module RDF::Turtle
       case token && token.type
       when :IRIREF, :YAGO_STATEMENT_ID then prod(:iri)  {process_iri(@lexer.shift)}
       when :PNAME_LN, :PNAME_NS then prod(:iri) {pname(*@lexer.shift.value.split(':', 2))}
-      end
-    end
-
-    def read_yago_statement_id
-      prod(:yago_statement_resource) do
-        token = @lexer.first
-        if token && token.type == :YAGO_STATEMENT_ID
-          prod(:yago_statement) do
-            @statement_id = read_iri
-          end
-        end
       end
     end
 
