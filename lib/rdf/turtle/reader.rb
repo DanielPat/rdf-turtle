@@ -320,6 +320,7 @@ module RDF::Turtle
       prod(:triples, %w{.}) do
         error("read_triples", "Unexpected end of file") unless token = @lexer.first
         id = read_yago_statement_id
+        puts caller[0]
         case token.type || token.value
         when '['
           # blankNodePropertyList predicateObjectList? 

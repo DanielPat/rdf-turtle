@@ -145,10 +145,8 @@ module RDF::Turtle
     # @param  [RDF::URI]      predicate
     # @param  [RDF::Value]    object
     # @return [void]
-    def write_triple(subject, predicate, object, id = nil)
+    def write_triple(subject, predicate, object)
       statement = RDF::Statement.new(subject, predicate, object)
-      puts "write_triple called, caller: #{caller[0]}"
-      statement.id = id if id
       if @options[:stream]
         stream_statement(statement)
       else
@@ -386,7 +384,6 @@ module RDF::Turtle
       bump_reference(statement.object)
       @subjects[statement.subject] = true
       # Pre-fetch pnames, to fill prefixes
-      get_pname(statement.id)
       get_pname(statement.subject)
       get_pname(statement.predicate)
       get_pname(statement.object)
